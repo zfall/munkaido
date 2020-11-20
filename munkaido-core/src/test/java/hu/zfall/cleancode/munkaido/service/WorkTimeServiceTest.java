@@ -58,9 +58,9 @@ public class WorkTimeServiceTest {
         //then
         assertNotNull(response);
         assertEquals("OK", response.getMessage());
-        verify(repository, Mockito.times(1)).saveNewItem(argThat(item -> item.getStartitem().equals(currentTimeStamp)
-                && item.getDay().equals(currentDay)
-                && item.getUsername().equals(expectedUsername) && isBlank(item.getEnditem()) && item.getSpecial() == null));
+        verify(repository, Mockito.times(1)).saveNewItem(argThat(item -> item.startItem.equals(currentTimeStamp)
+                && item.day.equals(currentDay)
+                && item.username.equals(expectedUsername) && isBlank(item.endItem) && item.special == null));
 
     }
 
@@ -68,7 +68,7 @@ public class WorkTimeServiceTest {
     public void testStartWorkWithUnfinishedItem() {
         //given
         final WorkTimeItem unfinishedItem = new WorkTimeItem();
-        unfinishedItem.setStartitem(startItemTimeStamp);
+        unfinishedItem.startItem = startItemTimeStamp;
         when(repository.loadTodayUnfinishedItemForUsername(expectedUsername)).thenReturn(unfinishedItem);
 
         //when
@@ -104,7 +104,7 @@ public class WorkTimeServiceTest {
         //then
         assertNotNull(response);
         assertEquals("OK", response.getMessage());
-        verify(repository, Mockito.times(1)).updateItem(argThat(i -> i == item && i.getEnditem().equals(endItemTimeStamp)));
+        verify(repository, Mockito.times(1)).updateItem(argThat(i -> i == item && i.endItem.equals(endItemTimeStamp)));
 
     }
 
@@ -122,7 +122,7 @@ public class WorkTimeServiceTest {
         assertNotNull(response);
         assertEquals("OK", response.getMessage());
         verify(repository, Mockito.times(1))
-                .updateItem(argThat(i -> i == item && i.getEnditem().equals(endItemTimeStamp) && i.getSpecial().equals(LUNCH)));
+                .updateItem(argThat(i -> i == item && i.endItem.equals(endItemTimeStamp) && i.special.equals(LUNCH)));
     }
 
     @Test

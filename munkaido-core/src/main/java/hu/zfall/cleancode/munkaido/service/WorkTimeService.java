@@ -28,7 +28,7 @@ public class WorkTimeService {
         WorkTimeItem item = repository.loadTodayUnfinishedItemForUsername(username);
 
         if (item != null) {
-            throw new AlreadyStartedWorkException("Work already started at: " + item.getStartitem());
+            throw new AlreadyStartedWorkException("Work already started at: " + item.startItem);
         }
 
         item = createNewWorkTimeItem(username);
@@ -53,8 +53,8 @@ public class WorkTimeService {
             throw new NotYetStartedWorkException();
         }
 
-        item.setEnditem(timeService.getCurrentTimestamp());
-        item.setSpecial(special);
+        item.endItem = timeService.getCurrentTimestamp();
+        item.special = special;
 
         repository.updateItem(item);
 
@@ -63,9 +63,9 @@ public class WorkTimeService {
 
     private WorkTimeItem createNewWorkTimeItem(final String username) {
         final WorkTimeItem item = new WorkTimeItem();
-        item.setDay(timeService.getCurrentDay());
-        item.setStartitem(timeService.getCurrentTimestamp());
-        item.setUsername(username);
+        item.day = timeService.getCurrentDay();
+        item.startItem = timeService.getCurrentTimestamp();
+        item.username = username;
         return item;
     }
 
@@ -75,12 +75,12 @@ public class WorkTimeService {
         boolean wasLunch = false;
 
         for (final WorkTimeItem item : items) {
-            if (LUNCH.equals(item.getSpecial())) {
+            if (LUNCH.equals(item.special)) {
                 wasLunch = true;
             }
-            final long start = timeService.convertDateFromTimestampString(item.getStartitem()).getTime();
-            final long end = (StringUtils.isBlank(item.getEnditem()) ? timeService.getCurrentUtilDate()
-                    : timeService.convertDateFromTimestampString(item.getEnditem())).getTime();
+            final long start = timeService.convertDateFromTimestampString(item.startItem).getTime();
+            final long end = (StringUtils.isBlank(item.endItem) ? timeService.getCurrentUtilDate()
+                    : timeService.convertDateFromTimestampString(item.endItem)).getTime();
             millisecondsWorked = millisecondsWorked + (int)(end - start);
         }
         int millisecondsToWork = wasLunch ? 8 * 60 * 60 * 1000 : (8 * 60 + 20) * 60 * 1000;

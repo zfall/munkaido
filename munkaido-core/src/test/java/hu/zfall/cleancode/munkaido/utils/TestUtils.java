@@ -7,27 +7,27 @@ import hu.zfall.cleancode.munkaido.domain.WorkTimeItemSpecial;
 
 public class TestUtils {
 
-    public static List<WorkTimeItem> createWorkTimeItemListOne(final String startitem, final String enditem) {
+    public static List<WorkTimeItem> createWorkTimeItemListOne(final String startItem, final String endItem) {
         final WorkTimeItem item = new WorkTimeItem();
-        item.setStartitem(startitem);
-        item.setEnditem(enditem);
+        item.startItem = startItem;
+        item.endItem = endItem;
         final List<WorkTimeItem> items = new ArrayList<>();
         items.add(item);
         return items;
     }
 
-    public static List<WorkTimeItem> createWorkTimeItemListTwo(final String startitem, final String enditem,
-                                                               final String startitem2, final String enditem2,
+    public static List<WorkTimeItem> createWorkTimeItemListTwo(final String startItem, final String endItem,
+                                                               final String startItem2, final String endItem2,
                                                                final WorkTimeItemSpecial special) {
         final List<WorkTimeItem> items = new ArrayList<>();
         WorkTimeItem item = new WorkTimeItem();
-        item.setStartitem(startitem);
-        item.setEnditem(enditem);
-        item.setSpecial(special);
+        item.startItem = startItem;
+        item.endItem = endItem;
+        item.special = special;
         items.add(item);
         item = new WorkTimeItem();
-        item.setStartitem(startitem2);
-        item.setEnditem(enditem2);
+        item.startItem = startItem2;
+        item.endItem = endItem2;
         items.add(item);
         return items;
     }
