@@ -19,6 +19,8 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <spring.version>5.2.6.RELEASE</spring.version>
         <springboot.version>2.3.0.RELEASE</springboot.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-jar-plugin.version>3.0.0</maven-jar-plugin.version>
     </properties>
 
     <repositories>
@@ -27,12 +29,20 @@
     <build>
         <!-- Fix eclipse error: org.codehaus.plexus.archiver.jar.Manifest.write(java.io.PrintWriter) -->
         <pluginManagement>
+
             <plugins>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <version>${maven-surefire-plugin.version}</version>
                 </plugin>
             </plugins>
+
         </pluginManagement>
 
         <plugins>
@@ -44,6 +54,19 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-source-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>attach-sources</id>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>
