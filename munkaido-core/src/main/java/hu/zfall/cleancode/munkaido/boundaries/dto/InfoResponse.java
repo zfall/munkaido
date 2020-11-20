@@ -1,4 +1,4 @@
-package hu.zfall.cleancode.munkaido.dto;
+package hu.zfall.cleancode.munkaido.boundaries.dto;
 
 public class InfoResponse {
     private String message;

@@ -18,10 +18,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import hu.zfall.cleancode.munkaido.boundaries.dto.InfoResponse;
+import hu.zfall.cleancode.munkaido.boundaries.dto.WorkTimeSummary;
 import hu.zfall.cleancode.munkaido.domain.WorkTimeItem;
 import hu.zfall.cleancode.munkaido.domain.WorkTimeItemSpecial;
-import hu.zfall.cleancode.munkaido.dto.InfoResponse;
-import hu.zfall.cleancode.munkaido.dto.WorkTimeSummary;
 import hu.zfall.cleancode.munkaido.exception.AlreadyStartedWorkException;
 import hu.zfall.cleancode.munkaido.exception.NotYetStartedWorkException;
 import hu.zfall.cleancode.munkaido.repository.WorkTimeItemRepository;
@@ -128,7 +128,7 @@ public class WorkTimeServiceTest {
     @Test
     public void testSummary_zeroRecord() {
         //when
-        final WorkTimeSummary response = target.getSummary(expectedUsername);
+        final WorkTimeSummary response = target.generateSummary(expectedUsername);
 
         //then
         assertNotNull(response);
@@ -141,7 +141,7 @@ public class WorkTimeServiceTest {
         final List<WorkTimeItem> items = TestUtils.createWorkTimeItemListOne("20201015090000", "20201015160000");
         when(repository.getAllItemsTodayForUsernameOrderedByStartItem(expectedUsername)).thenReturn(items);
         //when
-        final WorkTimeSummary response = target.getSummary(expectedUsername);
+        final WorkTimeSummary response = target.generateSummary(expectedUsername);
 
         //then
         assertNotNull(response);
@@ -155,7 +155,7 @@ public class WorkTimeServiceTest {
                 "20201015110000", "20201015120000", null);
         when(repository.getAllItemsTodayForUsernameOrderedByStartItem(expectedUsername)).thenReturn(items);
         //when
-        final WorkTimeSummary response = target.getSummary(expectedUsername);
+        final WorkTimeSummary response = target.generateSummary(expectedUsername);
 
         //then
         assertNotNull(response);
@@ -169,7 +169,7 @@ public class WorkTimeServiceTest {
                 "20201015110000", "20201015120000", WorkTimeItemSpecial.LUNCH);
         when(repository.getAllItemsTodayForUsernameOrderedByStartItem(expectedUsername)).thenReturn(items);
         //when
-        final WorkTimeSummary response = target.getSummary(expectedUsername);
+        final WorkTimeSummary response = target.generateSummary(expectedUsername);
 
         //then
         assertNotNull(response);
@@ -185,7 +185,7 @@ public class WorkTimeServiceTest {
         when(timeService.getCurrentUtilDate()).thenReturn(new SimpleDateFormat("yyyyMMddHHmmss").parse("20201015103000"));
 
         //when
-        final WorkTimeSummary response = target.getSummary(expectedUsername);
+        final WorkTimeSummary response = target.generateSummary(expectedUsername);
 
         //then
         assertNotNull(response);
@@ -201,7 +201,7 @@ public class WorkTimeServiceTest {
         when(timeService.getCurrentUtilDate()).thenReturn(new SimpleDateFormat("yyyyMMddHHmmss").parse("20201015103000"));
 
         //when
-        final WorkTimeSummary response = target.getSummary(expectedUsername);
+        final WorkTimeSummary response = target.generateSummary(expectedUsername);
 
         //then
         assertNotNull(response);

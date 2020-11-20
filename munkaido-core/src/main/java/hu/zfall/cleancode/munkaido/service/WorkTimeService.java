@@ -6,16 +6,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import hu.zfall.cleancode.munkaido.boundaries.StartEndWorkRegistration;
+import hu.zfall.cleancode.munkaido.boundaries.WorkReport;
+import hu.zfall.cleancode.munkaido.boundaries.dto.InfoResponse;
+import hu.zfall.cleancode.munkaido.boundaries.dto.WorkTimeSummary;
 import hu.zfall.cleancode.munkaido.domain.WorkTimeItem;
 import hu.zfall.cleancode.munkaido.domain.WorkTimeItemSpecial;
-import hu.zfall.cleancode.munkaido.dto.InfoResponse;
-import hu.zfall.cleancode.munkaido.dto.WorkTimeSummary;
 import hu.zfall.cleancode.munkaido.exception.AlreadyStartedWorkException;
 import hu.zfall.cleancode.munkaido.exception.NotYetStartedWorkException;
 import hu.zfall.cleancode.munkaido.repository.WorkTimeItemRepository;
 
 @Service
-public class WorkTimeService {
+public class WorkTimeService implements WorkReport, StartEndWorkRegistration {
 
     @Autowired
     private WorkTimeItemRepository repository;
@@ -23,6 +25,7 @@ public class WorkTimeService {
     @Autowired
     private TimeService            timeService;
 
+    @Override
     @Transactional
     public InfoResponse startWork(final String username) {
         WorkTimeItem item = repository.loadTodayUnfinishedItemForUsername(username);
@@ -38,10 +41,17 @@ public class WorkTimeService {
         return new InfoResponse("OK");
     }
 
+    @Override
+    public InfoResponse endLanch(String username) {
+        return endWork(username);
+    }
+
+    @Override
     public InfoResponse endWork(final String username) {
         return endWork(username, null);
     }
 
+    @Override
     public InfoResponse startLanch(final String username) {
         return endWork(username, WorkTimeItemSpecial.LUNCH);
     }
@@ -69,7 +79,8 @@ public class WorkTimeService {
         return item;
     }
 
-    public WorkTimeSummary getSummary(final String username) {
+    @Override
+    public WorkTimeSummary generateSummary(final String username) {
         final List<WorkTimeItem> items = repository.getAllItemsTodayForUsernameOrderedByStartItem(username);
         int millisecondsWorked = 0;
         boolean wasLunch = false;
