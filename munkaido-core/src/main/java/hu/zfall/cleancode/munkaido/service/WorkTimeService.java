@@ -47,7 +47,7 @@ public class WorkTimeService implements WorkReport, StartEndWorkRegistration {
 
     @Override
     public InfoResponse endLanch(String username) {
-        return endWork(username);
+        return startWork(username);
     }
 
     @Override

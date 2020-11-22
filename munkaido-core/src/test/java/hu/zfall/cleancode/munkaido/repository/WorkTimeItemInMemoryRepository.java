@@ -48,7 +48,7 @@ public class WorkTimeItemInMemoryRepository implements WorkTimeItemRepository {
 
         executeStatement(statement -> {
             try (ResultSet rs = statement.executeQuery("select * from work_time_item where username = '" + username
-                    + "' and day = '" + UtilConv.localDate2Str(timeService.getCurrentLocalDate()) + "'")) {
+                    + "' and day = '" + UtilConv.localDate2Str(timeService.getCurrentLocalDate()) + "' ORDER BY startItem")) {
                 mapWorkTimeItems(rs, itemList);
             }
         });
@@ -80,17 +80,17 @@ public class WorkTimeItemInMemoryRepository implements WorkTimeItemRepository {
                 + UtilConv.localDate2Str(item.day) + "','"
                 + UtilConv.offsetDateTime2Str(item.startItem) + "',"
                 + (endItemValue == null ? "null," : "'" + endItemValue + "',")
-                + (item.special == null ? "null" : "'" + item.special + "'") + ")";
+                + (item.special == null ? "null" : "'" + item.special.getValue() + "'") + ")";
 
         executeStatement(statement -> statement.executeUpdate(sql));
     }
 
     @Override
     public void updateItem(WorkTimeItem item) {
-        String sql = "update work_time_item set endItem = '" + UtilConv.offsetDateTime2Str(item.endItem)
-                + "', special = '" + item.special
-                + "' WHERE username = '" + item.username + "' AND day = '" + UtilConv.localDate2Str(item.day)
-                + "' AND startItem = '" + UtilConv.offsetDateTime2Str(item.startItem) + "'";
+        String sql = "update work_time_item set endItem = '" + UtilConv.offsetDateTime2Str(item.endItem) + "',"
+                + " special = " + (item.special == null ? "null" : "'" + item.special.getValue() + "'")
+                + " WHERE username = '" + item.username + "' AND day = '" + UtilConv.localDate2Str(item.day) + "'"
+                + " AND startItem = '" + UtilConv.offsetDateTime2Str(item.startItem) + "'";
 
         executeStatement(statement -> statement.executeUpdate(sql));
     }
