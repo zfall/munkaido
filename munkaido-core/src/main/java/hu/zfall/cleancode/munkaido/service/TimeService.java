@@ -16,8 +16,13 @@ public class TimeService {
         return OffsetDateTime.now();
     }
 
-    public String prettyPrintTime(final long timeSeconds) {
+    public String prettyPrintTime(final long timeSec) {
+        long timeSeconds = timeSec;
         final StringBuilder b = new StringBuilder();
+        if (timeSeconds < 0) {
+            b.append("-");
+            timeSeconds = timeSeconds * (-1);
+        }
         b.append(timeSeconds / 3600);
         b.append(":");
         int restSeconds = (int)timeSeconds % 3600;

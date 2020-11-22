@@ -12,11 +12,11 @@ import hu.zfall.cleancode.munkaido.utils.TestUtils;
 
 public class StartEndWorkRegistrationPackageTest {
 
-    private StartEndWorkRegistration workReg    = null;
+    private static final String            username   = "zoli";
 
-    WorkTimeItemInMemoryRepository   repository = new WorkTimeItemInMemoryRepository();
+    private StartEndWorkRegistration       workReg    = null;
 
-    private static final String      username   = "zoli";
+    private WorkTimeItemInMemoryRepository repository = new WorkTimeItemInMemoryRepository();
 
     @BeforeEach
     private void init() {
