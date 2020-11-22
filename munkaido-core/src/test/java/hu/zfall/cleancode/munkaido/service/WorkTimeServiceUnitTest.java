@@ -116,7 +116,7 @@ public class WorkTimeServiceUnitTest {
         when(timeService.getCurrentOffsetDateTime()).thenReturn(endItemTimeStamp);
 
         //when
-        final InfoResponse response = target.startLanch(expectedUsername);
+        final InfoResponse response = target.startLunch(expectedUsername);
 
         //then
         assertNotNull(response);

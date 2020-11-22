@@ -54,7 +54,7 @@ public class StartEndWorkRegistrationPackageTest {
     @Test
     public void testStartWorkLunch() {
         workReg.startWork(username);
-        workReg.startLanch(username);
+        workReg.startLunch(username);
         List<WorkTimeItem> itemList = repository.getAllItemsTodayForUsernameOrderedByStartItem(username);
 
         Assertions.assertEquals(1, itemList.size());
@@ -66,9 +66,9 @@ public class StartEndWorkRegistrationPackageTest {
     @Test
     public void testStartWorkLunchBack() {
         workReg.startWork(username);
-        workReg.startLanch(username);
+        workReg.startLunch(username);
         sleep(1000);
-        workReg.endLanch(username);
+        workReg.endLunch(username);
         List<WorkTimeItem> itemList = repository.getAllItemsTodayForUsernameOrderedByStartItem(username);
 
         Assertions.assertEquals(2, itemList.size());
@@ -83,9 +83,9 @@ public class StartEndWorkRegistrationPackageTest {
     @Test
     public void testStartWorkLunchBackEnd() {
         workReg.startWork(username);
-        workReg.startLanch(username);
+        workReg.startLunch(username);
         sleep(1000);
-        workReg.endLanch(username);
+        workReg.endLunch(username);
         workReg.endWork(username);
         List<WorkTimeItem> itemList = repository.getAllItemsTodayForUsernameOrderedByStartItem(username);
 

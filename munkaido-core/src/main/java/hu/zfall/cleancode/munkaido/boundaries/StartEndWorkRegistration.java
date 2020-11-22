@@ -8,8 +8,8 @@ public interface StartEndWorkRegistration {
 
     InfoResponse endWork(final String username);
 
-    InfoResponse startLanch(final String username);
+    InfoResponse startLunch(final String username);
 
-    InfoResponse endLanch(final String username);
+    InfoResponse endLunch(final String username);
 
 }

@@ -46,7 +46,7 @@ public class WorkTimeService implements WorkReport, StartEndWorkRegistration {
     }
 
     @Override
-    public InfoResponse endLanch(String username) {
+    public InfoResponse endLunch(String username) {
         return startWork(username);
     }
 
@@ -56,7 +56,7 @@ public class WorkTimeService implements WorkReport, StartEndWorkRegistration {
     }
 
     @Override
-    public InfoResponse startLanch(final String username) {
+    public InfoResponse startLunch(final String username) {
         return endWork(username, WorkTimeItemSpecial.LUNCH);
     }
 
