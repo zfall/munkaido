@@ -4,18 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
+import hu.zfall.cleancode.munkaido.boundaries.dto.InfoResponse;
+import hu.zfall.cleancode.munkaido.boundaries.dto.WorkTimeSummary;
 import hu.zfall.cleancode.munkaido.repository.WorkTimeItemInMemoryRepository;
 import hu.zfall.cleancode.munkaido.service.TimeService;
 import hu.zfall.cleancode.munkaido.service.WorkTimeService;
-import hu.zfall.cleancode.munkaido.testcli.commands.*;
 import hu.zfall.cleancode.munkaido.utils.TestUtils;
 
 public class CliApp {
-
-    public static List<Command>   COMMANDS        = Arrays.asList(new HelpCommand(), new QuitCommand(), new StartWorkCommand(),
-            new EndWorkCommand(), new StartLunchCommand(), new EndLunchCommand(), new SummaryCommand());
 
     public static WorkTimeService workTimeService = null;
 
@@ -33,18 +30,62 @@ public class CliApp {
                 System.out.print("\n> ");
                 readLine = br.readLine();
                 String[] readWords = readLine.split(" ");
+
                 if (readWords.length > 0) {
-                    Optional<Command> commandOption = COMMANDS.stream().filter(c -> c.getName().equals(readWords[0])).findFirst();
-                    if (commandOption.isPresent()) {
-                        String[] params = Arrays.copyOfRange(readWords, 1, readWords.length);
-                        commandOption.get().execute(params);
-                    } else {
-                        System.out.println("Unknown command: " + readWords[0]);
+                    String command = readWords[0];
+                    String[] params = Arrays.copyOfRange(readWords, 1, readWords.length);
+                    switch (command) {
+                        case "h":
+                            System.out.println("Avaialble commands: startWork, endWork, startLunch, endLunch, summary");
+                            break;
+                        case "q":
+                            System.out.println("Bye");
+                            break;
+                        case "startWork":
+                            callRegistration(params, u -> workTimeService.startWork(u));
+                            break;
+                        case "endWork":
+                            callRegistration(params, u -> workTimeService.endWork(u));
+                            break;
+                        case "startLunch":
+                            callRegistration(params, u -> workTimeService.startLunch(u));
+                            break;
+                        case "endLunch":
+                            callRegistration(params, u -> workTimeService.endLunch(u));
+                            break;
+                        case "summary":
+                            callSummary(params);
+                            break;
+                        default:
+                            System.out.println("Unknown command: " + command);
                     }
                 }
             }
         } catch (IOException ioe) {
             System.out.println(ioe);
+        }
+    }
+
+    private static void callSummary(String[] params) {
+        if (params.length != 1) {
+            System.err.println("Exactly one parameter required!");
+        } else {
+            WorkTimeSummary summary = CliApp.workTimeService.generateSummary(params[0]);
+
+            System.out.println("Worked time:    " + summary.getWorkedTime() + "\nRemaining time: " + summary.getRemainingTime());
+        }
+    }
+
+    private static void callRegistration(String[] params, Function<String, InfoResponse> registrationFunction) {
+        if (params.length != 1) {
+            System.err.println("Exactly one parameter required!");
+        } else {
+            try {
+                System.out.println(registrationFunction.apply(params[0]).getMessage());
+            } catch (Exception e) {
+                System.err.println(e.getClass().getName() + (e.getMessage() == null ? "" : e.getMessage()));
+            }
+
         }
     }
 
