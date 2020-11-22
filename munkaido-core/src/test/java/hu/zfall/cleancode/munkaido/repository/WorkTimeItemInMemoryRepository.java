@@ -46,9 +46,12 @@ public class WorkTimeItemInMemoryRepository implements WorkTimeItemRepository {
     public List<WorkTimeItem> getAllItemsTodayForUsernameOrderedByStartItem(String username) {
         List<WorkTimeItem> itemList = new ArrayList<>();
 
+        String currentDay = UtilConv.localDate2Str(timeService.getCurrentLocalDate());
+        String sql = "select * from work_time_item where username = '" + username + "' and day = '" + currentDay
+                + "' ORDER BY startItem";
+
         executeStatement(statement -> {
-            try (ResultSet rs = statement.executeQuery("select * from work_time_item where username = '" + username
-                    + "' and day = '" + UtilConv.localDate2Str(timeService.getCurrentLocalDate()) + "' ORDER BY startItem")) {
+            try (ResultSet rs = statement.executeQuery(sql)) {
                 mapWorkTimeItems(rs, itemList);
             }
         });
