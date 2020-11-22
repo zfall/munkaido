@@ -1,14 +1,13 @@
 package hu.zfall.cleancode.munkaido.service;
 
 import static hu.zfall.cleancode.munkaido.domain.WorkTimeItemSpecial.LUNCH;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,9 +25,10 @@ import hu.zfall.cleancode.munkaido.exception.AlreadyStartedWorkException;
 import hu.zfall.cleancode.munkaido.exception.NotYetStartedWorkException;
 import hu.zfall.cleancode.munkaido.repository.WorkTimeItemRepository;
 import hu.zfall.cleancode.munkaido.utils.TestUtils;
+import hu.zfall.cleancode.munkaido.utils.UtilConv;
 
 @ExtendWith(MockitoExtension.class)
-public class WorkTimeServiceTest {
+public class WorkTimeServiceUnitTest {
 
     @InjectMocks
     private WorkTimeService        target;
@@ -40,17 +40,17 @@ public class WorkTimeServiceTest {
     private TimeService            timeService;
 
     private final String           expectedUsername   = "username";
-    private final String           currentTimeStamp   = "20201018183100";
-    private final String           startItemTimeStamp = "20201018184400";
-    private final String           endItemTimeStamp   = "20201018184500";
-    private final String           currentDay         = "20201018";
+    private final OffsetDateTime   currentTimeStamp   = UtilConv.str2OffsetDateTime("20201018183100");
+    private final OffsetDateTime   startItemTimeStamp = UtilConv.str2OffsetDateTime("20201018184400");
+    private final OffsetDateTime   endItemTimeStamp   = UtilConv.str2OffsetDateTime("20201018184500");
+    private final LocalDate        currentDay         = UtilConv.str2LocalDate("20201018");
 
     @Test
     public void testStartWorkWithoutUnfinishedItem() {
         //given
         when(repository.loadTodayUnfinishedItemForUsername(expectedUsername)).thenReturn(null);
-        when(timeService.getCurrentTimestamp()).thenReturn(currentTimeStamp);
-        when(timeService.getCurrentDay()).thenReturn(currentDay);
+        when(timeService.getCurrentOffsetDateTime()).thenReturn(currentTimeStamp);
+        when(timeService.getCurrentLocalDate()).thenReturn(currentDay);
 
         //when
         final InfoResponse response = target.startWork(expectedUsername);
@@ -60,7 +60,7 @@ public class WorkTimeServiceTest {
         assertEquals("OK", response.getMessage());
         verify(repository, Mockito.times(1)).saveNewItem(argThat(item -> item.startItem.equals(currentTimeStamp)
                 && item.day.equals(currentDay)
-                && item.username.equals(expectedUsername) && isBlank(item.endItem) && item.special == null));
+                && item.username.equals(expectedUsername) && item.endItem == null && item.special == null));
 
     }
 
@@ -96,7 +96,7 @@ public class WorkTimeServiceTest {
         //given
         final WorkTimeItem item = new WorkTimeItem();
         when(repository.loadTodayUnfinishedItemForUsername(expectedUsername)).thenReturn(item);
-        when(timeService.getCurrentTimestamp()).thenReturn(endItemTimeStamp);
+        when(timeService.getCurrentOffsetDateTime()).thenReturn(endItemTimeStamp);
 
         //when
         final InfoResponse response = target.endWork(expectedUsername);
@@ -113,7 +113,7 @@ public class WorkTimeServiceTest {
         //given
         final WorkTimeItem item = new WorkTimeItem();
         when(repository.loadTodayUnfinishedItemForUsername(expectedUsername)).thenReturn(item);
-        when(timeService.getCurrentTimestamp()).thenReturn(endItemTimeStamp);
+        when(timeService.getCurrentOffsetDateTime()).thenReturn(endItemTimeStamp);
 
         //when
         final InfoResponse response = target.startLanch(expectedUsername);
@@ -178,11 +178,11 @@ public class WorkTimeServiceTest {
     }
 
     @Test
-    public void testSummary_oneRecordNotClosed() throws ParseException {
+    public void testSummary_oneRecordNotClosed() {
         //given
         final List<WorkTimeItem> items = TestUtils.createWorkTimeItemListOne("20201015090000", null);
         when(repository.getAllItemsTodayForUsernameOrderedByStartItem(expectedUsername)).thenReturn(items);
-        when(timeService.getCurrentUtilDate()).thenReturn(new SimpleDateFormat("yyyyMMddHHmmss").parse("20201015103000"));
+        when(timeService.getCurrentOffsetDateTime()).thenReturn(UtilConv.str2OffsetDateTime("20201015103000"));
 
         //when
         final WorkTimeSummary response = target.generateSummary(expectedUsername);
@@ -194,11 +194,11 @@ public class WorkTimeServiceTest {
     }
 
     @Test
-    public void testSummary_oneRecordNotClosedWithEmptyString() throws ParseException {
+    public void testSummary_oneRecordNotClosedWithEmptyString() {
         //given
         final List<WorkTimeItem> items = TestUtils.createWorkTimeItemListOne("20201015090000", "");
         when(repository.getAllItemsTodayForUsernameOrderedByStartItem(expectedUsername)).thenReturn(items);
-        when(timeService.getCurrentUtilDate()).thenReturn(new SimpleDateFormat("yyyyMMddHHmmss").parse("20201015103000"));
+        when(timeService.getCurrentOffsetDateTime()).thenReturn(UtilConv.str2OffsetDateTime("20201015103000"));
 
         //when
         final WorkTimeSummary response = target.generateSummary(expectedUsername);

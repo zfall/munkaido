@@ -1,59 +1,37 @@
 package hu.zfall.cleancode.munkaido.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import org.springframework.stereotype.Service;
-import hu.zfall.cleancode.munkaido.exception.MunkaidoException;
 
 @Service
 public class TimeService {
     public static final String TIMESTAMP_DAO_PATTERN = "yyyyMMddHHmmss";
 
-    public String getCurrentDay() {
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        return sdf.format(new Date());
+    public LocalDate getCurrentLocalDate() {
+        return LocalDate.now();
     }
 
-    public java.sql.Date getCurrentDaySQL() {
-        return new java.sql.Date(new Date().getTime());
+    public OffsetDateTime getCurrentOffsetDateTime() {
+        return OffsetDateTime.now();
     }
 
-    public String getCurrentTimestamp() {
-        final SimpleDateFormat sdf = new SimpleDateFormat(TIMESTAMP_DAO_PATTERN);
-        return sdf.format(new Date());
-    }
-
-    public Date getCurrentUtilDate() {
-        return new Date();
-    }
-
-    public Date convertDateFromTimestampString(final String timestamp) {
-        try {
-            final SimpleDateFormat sdf = new SimpleDateFormat(TIMESTAMP_DAO_PATTERN);
-            return sdf.parse(timestamp);
-        } catch (final ParseException e) {
-            throw new MunkaidoException("Exception in convertDateFromTimestampString", e);
-        }
-    }
-
-    public String printHoursMinutesSeconds(final long milliseconds) {
+    public String prettyPrintTime(final long timeSeconds) {
         final StringBuilder b = new StringBuilder();
-        b.append(milliseconds / 3600000);
+        b.append(timeSeconds / 3600);
         b.append(":");
-        int restMillis = (int)milliseconds % 3600000;
-        final int minutes = restMillis / 60000;
+        int restSeconds = (int)timeSeconds % 3600;
+        final int minutes = restSeconds / 60;
         if (minutes < 10) {
             b.append("0");
         }
         b.append(minutes);
         b.append(":");
-        restMillis = restMillis % 60000;
-        final int seconds = restMillis / 1000;
-        if (seconds < 10) {
+        restSeconds = restSeconds % 60;
+        if (restSeconds < 10) {
             b.append("0");
         }
-        b.append(seconds);
+        b.append(restSeconds);
         return b.toString();
 
     }

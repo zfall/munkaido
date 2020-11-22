@@ -1,8 +1,9 @@
 package hu.zfall.cleancode.munkaido.service;
 
 import static hu.zfall.cleancode.munkaido.domain.WorkTimeItemSpecial.LUNCH;
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,9 @@ import hu.zfall.cleancode.munkaido.repository.WorkTimeItemRepository;
 
 @Service
 public class WorkTimeService implements WorkReport, StartEndWorkRegistration {
+
+    private static final long      DAILY_WORKTIME_SECONDS = 8 * 60 * 60;
+    private static final long      LUNCHBREAK_SECONDS     = 20 * 60;
 
     @Autowired
     private WorkTimeItemRepository repository;
@@ -63,7 +67,7 @@ public class WorkTimeService implements WorkReport, StartEndWorkRegistration {
             throw new NotYetStartedWorkException();
         }
 
-        item.endItem = timeService.getCurrentTimestamp();
+        item.endItem = timeService.getCurrentOffsetDateTime();
         item.special = special;
 
         repository.updateItem(item);
@@ -73,8 +77,8 @@ public class WorkTimeService implements WorkReport, StartEndWorkRegistration {
 
     private WorkTimeItem createNewWorkTimeItem(final String username) {
         final WorkTimeItem item = new WorkTimeItem();
-        item.day = timeService.getCurrentDay();
-        item.startItem = timeService.getCurrentTimestamp();
+        item.day = timeService.getCurrentLocalDate();
+        item.startItem = timeService.getCurrentOffsetDateTime();
         item.username = username;
         return item;
     }
@@ -82,22 +86,20 @@ public class WorkTimeService implements WorkReport, StartEndWorkRegistration {
     @Override
     public WorkTimeSummary generateSummary(final String username) {
         final List<WorkTimeItem> items = repository.getAllItemsTodayForUsernameOrderedByStartItem(username);
-        int millisecondsWorked = 0;
+        long secondsWorked = 0;
         boolean wasLunch = false;
 
+        OffsetDateTime now = timeService.getCurrentOffsetDateTime();
         for (final WorkTimeItem item : items) {
             if (LUNCH.equals(item.special)) {
                 wasLunch = true;
             }
-            final long start = timeService.convertDateFromTimestampString(item.startItem).getTime();
-            final long end = (StringUtils.isBlank(item.endItem) ? timeService.getCurrentUtilDate()
-                    : timeService.convertDateFromTimestampString(item.endItem)).getTime();
-            millisecondsWorked = millisecondsWorked + (int)(end - start);
+            Duration d = Duration.between(item.startItem, (item.endItem == null ? now : item.endItem));
+            secondsWorked = secondsWorked + d.getSeconds();
         }
-        int millisecondsToWork = wasLunch ? 8 * 60 * 60 * 1000 : (8 * 60 + 20) * 60 * 1000;
-        millisecondsToWork = millisecondsToWork - millisecondsWorked;
-        return new WorkTimeSummary(timeService.printHoursMinutesSeconds(millisecondsWorked),
-                timeService.printHoursMinutesSeconds(millisecondsToWork));
+        long secondsRemaining = wasLunch ? DAILY_WORKTIME_SECONDS : DAILY_WORKTIME_SECONDS + LUNCHBREAK_SECONDS;
+        secondsRemaining = secondsRemaining - secondsWorked;
+        return new WorkTimeSummary(timeService.prettyPrintTime(secondsWorked), timeService.prettyPrintTime(secondsRemaining));
     }
 
 }

@@ -10,3 +10,4 @@
 **/.checkstyle
 **/.tern-project
 /.metadata/
+**/sample.db
